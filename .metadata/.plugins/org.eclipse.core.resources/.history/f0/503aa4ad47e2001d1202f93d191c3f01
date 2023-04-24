@@ -1,0 +1,5 @@
+package edu.kh.comm.model.dao;
+
+public class MemberDAO {
+
+}
