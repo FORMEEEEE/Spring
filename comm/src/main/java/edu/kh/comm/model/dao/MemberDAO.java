@@ -1,5 +1,6 @@
 package edu.kh.comm.model.dao;
 
+import org.apache.ibatis.session.SqlSession;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,11 +32,27 @@ public class MemberDAO {
 		
 		//logger.debug(count + "");
 		
-		// 1행 조회 방법(파라미터 O)
-		String memberNickname = sqlSession.selectOne("memberMapper.test2", inputMember.getMemberEmail());
 		
-		logger.debug(memberNickname + "");
-		return null;
+		// 1행 조회 방법(파라미터 O)
+		/*String memberNickname = sqlSession.selectOne("memberMapper.test2", inputMember.getMemberEmail()); 
+		 * logger.debug(memberNickname + "");
+		 */
+		
+		/*
+		 * 1행 조회 방법(파라미터가 VO인 경우) String memberTel =
+		 * sqlSession.selectOne("memberMapper.test3", inputMember);
+		 * logger.debug(memberTel + "");
+		 */
+		
+		// 1행 조회(파라미터가 VO, 반환되는 결과도 VO 인경우)
+		Member loginMember = sqlSession.selectOne("memberMapper.login", inputMember);
+		logger.debug(loginMember + "");
+		
+		
+		
+		
+		
+		return loginMember;
 	}
 
 	
