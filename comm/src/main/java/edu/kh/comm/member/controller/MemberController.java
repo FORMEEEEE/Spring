@@ -1,6 +1,7 @@
 package edu.kh.comm.member.controller;
 
 import java.lang.ProcessBuilder.Redirect;
+import java.util.List;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -273,9 +274,24 @@ public class MemberController {
 	
 	@ResponseBody
 	@PostMapping("/selectOne")
-	public String selectOne(String memberEmail) {
+	public Member selectOne(@RequestParam("memberEmail") String memberEmail) {
+		
 		Member member = service.selectOne(memberEmail);
-		return new Gson().toJson(member);
+		
+		logger.debug(member + "");
+		
+		
+		return member;
+	}
+	
+	
+	@ResponseBody
+	@GetMapping("/selectAll")
+	public List<Member> selectAll(){
+		
+		List<Member> member = service.selectAll();
+		
+		return member;
 	}
 	
 	

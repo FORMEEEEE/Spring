@@ -97,7 +97,7 @@
 		<!--<select id="test3" parameterType="edu.kh.comm.member.model.vo.Member" resultType="string" >-->
 		<!-- parameterType에서 member는 mybatis-config의 typeAlias에서 정의함 -->
 		<select id="test3" parameterType="member" >
-		SELECT MEMBER_TEL FROM MEMBER_S
+		SELECT MEMBER_TEL FROM MEMBER
 		WHERE MEMBER_EMAIL = #{memberEmail}
 		AND MEMBER_PW = #{memberPw}
 		AND SECESSION_FL = 'N'
@@ -127,7 +127,7 @@
 			SELECT MEMBER_NO,MEMBER_EMAIL,MEMBER_NICK ,MEMBER_TEL,
 		    MEMBER_ADDR, PROFILE_IMG, 
 		    TO_CHAR( ENROLL_DT, 'YYYY-MM-DD HH24:MI:SS') AS ENROLL_DT, MEMBER_PW
-			FROM MEMBER_S
+			FROM MEMBER
 			WHERE MEMBER_EMAIL = #{memberEmail}
 			<!--AND MEMBER_PW = #{memberPw} -->
 			AND SECESSION_FL = 'N'
@@ -135,25 +135,29 @@
 		
 		<!-- 이메일 중복 검사 -->
 		<select id="emailDupCheck" parameterType="string" resultType="_int">
-		SELECT COUNT(*) FROM MEMBER_S
+		SELECT COUNT(*) FROM MEMBER
 		WHERE MEMBER_EMAIL = #{memberEmail}
 		AND SECESSION_FL = 'N'
 		</select>
 		
 		<select id="nicknameDupCheck" parameterType="string" resultType="_int">
-		SELECT COUNT(*) FROM MEMBER_S
+		SELECT COUNT(*) FROM MEMBER
 		WHERE MEMBER_NICK = #{memberNickname}
 		AND SECESSION_FL = 'N'
 		</select>
 		
 		<select id="signUp" parameterType="member" resultMap="member_rm">
-		INSERT INTO MEMBER_S VALUES(SEQ_MEMBER_NO.NEXTVAL, #{memberEmail}, #{memberPw}, #{memberNickname}, #{memberTel}, #{memberAddress}, DEFAULT, DEFAULT, DEFAULT)
+		INSERT INTO MEMBER VALUES(SEQ_MEMBER_NO.NEXTVAL, #{memberEmail}, #{memberPw}, #{memberNickname}, #{memberTel}, #{memberAddress}, DEFAULT, DEFAULT, DEFAULT)
 		</select>
 
 		<select id="selectOne" parameterType="member" resultMap="member_rm">
-		SELECT * FROM MEMBER_S
+		SELECT * FROM MEMBER
 		WHERE MEMBER_EMAIL = #{memberEmail}
 		AND SECESSION_FL = 'N'
+		</select>
+		
+		<select id="selectAll" parameterType="member" resultMap="member_rm">
+		SELECT MEMBER_NO , MEMBER_EMAIL , MEMBER_NICK  FROM MEMBER
 		</select>
 		
 		

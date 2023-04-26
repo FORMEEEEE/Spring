@@ -81,7 +81,7 @@ document.getElementById("select1").addEventListener("click", function(){
     // AJAX 코드 작성(jQuery 방식) -> jQuery 라이브러리가 추가 되어 있는지 확인
     $.ajax({
         //    /community/member/selectOne
-        url : "selectOne",
+        url : "member/selectOne",
         data : {"memberEmail" : input.value},
         type : "POST",
 

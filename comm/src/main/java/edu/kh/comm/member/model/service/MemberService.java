@@ -1,5 +1,7 @@
 package edu.kh.comm.member.model.service;
 
+import java.util.List;
+
 import edu.kh.comm.member.model.vo.Member;
 
 /*
@@ -40,5 +42,9 @@ public interface MemberService {
 
 
 	public abstract Member selectOne(String memberEmail);
+
+
+
+	public abstract List<Member> selectAll();
 	
 }
