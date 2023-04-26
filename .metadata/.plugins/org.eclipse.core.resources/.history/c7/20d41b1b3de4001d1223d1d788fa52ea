@@ -112,16 +112,6 @@ public class MemberServiceImpl implements MemberService{ //implements : 상속
 			
 		Member signUpMember = dao.memberSignup(inputMember);
 		
-		if( bcrypt.matches(inputMember.getMemberPw(), signUpMember.getMemberPw())) {
-			
-			// 비교 끝났으면 비밀번호 지워야함 안그러면 session으로 올라감
-			signUpMember.setMemberPw(null);
-			
-			
-		}else { // 비밀번호가 일치하지 않는 경우
-			signUpMember = null;
-		}
-		
 		return signUpMember;
 	}
 
