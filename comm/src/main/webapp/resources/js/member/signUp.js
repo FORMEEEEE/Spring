@@ -8,8 +8,10 @@ const checkObj = {
     "memberPwConfirm" : false,
     "memberNickname"  : false,
     "memberTel"       : false,
-    "sendEmail"       : false   // 인증번호 발송 체크
+    //"sendEmail"       : false   // 인증번호 발송 체크
 };
+
+
 
 
 
@@ -436,4 +438,9 @@ cBtn.addEventListener("click", function(){
         alert("인증번호 받기 버튼을 먼저 클릭해주세요.");
     }
 
+
+
+    
+
 });
+

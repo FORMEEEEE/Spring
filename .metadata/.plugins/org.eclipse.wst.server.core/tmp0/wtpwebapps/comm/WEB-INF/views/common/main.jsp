@@ -91,11 +91,11 @@
             		<%-- 로그인이 되어있지 않은 경우 --%>
        				<c:when test="${ empty sessionScope.loginMember }"> 
             		
-       			        <!-- 절대경로 : /community/member/login -->
-		           	 	<!-- 상대 경로 (index.jsp) 기준-->
+       			        <%-- 절대경로 : /community/member/login --%>
+		           	 	<%-- 상대 경로 (index.jsp) 기준--%>
 		                <form action="member/login" method="POST" name="login-form" onsubmit="return loginValidate()">
 		                   
-		                    <!-- 아이디(이메일)/비밀번호/로그인버튼 영역 -->
+		                    <%-- 아이디(이메일)/비밀번호/로그인버튼 영역 --%>
 		                    <fieldset id="id-pw-area">
 		        
 		                        <section>
@@ -105,7 +105,7 @@
 		                        </section>
 		        
 		                        <section>
-		                            <!-- button의 type 기본값은 submit -->
+		                            <%-- button의 type 기본값은 submit --%>
 		                            <button>로그인</button>
 		                        </section>
 		                    </fieldset>
@@ -119,23 +119,23 @@
                             </c:if>
 
 		                    <label>
-                                <!-- checked 속성 : radio/checkbox를 체크하는 속성 -->
+                                <%-- checked 속성 : radio/checkbox를 체크하는 속성 --%>
 		                        <input type="checkbox" name="saveId" ${chk}  id="saveId"> 아이디 저장
 		                    </label>
 
 
 
 		        
-		                    <!-- 회원가입 / ID/PW 찾기 영역 -->
+		                    <%-- 회원가입 / ID/PW 찾기 영역 --%>
 		                    <article id="signup-find-area">
 
-                                <!-- WEB-INF 폴더는 외부로 부터 직접적으로 요청할 수 없는 폴더
+                                <%-- WEB-INF 폴더는 외부로 부터 직접적으로 요청할 수 없는 폴더
                                     왜? 중요한 코드(자바, sql, 설정관련)가 위치하는 폴더로서
                                         외부로부터 접근을 차단하기 위해서
 
                                     -> 대신 Servlet을 이용 내부 접근(forward)은 가능
-                                -->
-		                       <!--  <a href="/community/WEB-INF/views/member/signUp.jsp">회원가입</a>  -->
+                                --%>
+		                       <%--  <a href="/community/WEB-INF/views/member/signUp.jsp">회원가입</a>  --%>
 
 		                        <a href="${contextPath}/member/signUp">회원가입</a> 
 
@@ -153,7 +153,7 @@
             		<c:otherwise>
             			
             			<article class="login-area">
-                            <!-- 회원 프로필 이미지 -->
+                            <%-- 회원 프로필 이미지 --%>
             				<a href="${contextPath}/member/myPage/profile">
                                 
                                 <c:if test="${empty loginMember.profileImage}">
@@ -166,7 +166,7 @@
 
             				</a>
 
-                            <!-- 회원 정보 + 로그아웃 버튼 -->                                       
+                            <%-- 회원 정보 + 로그아웃 버튼 --%>                                       
                             <div class="my-info">
                                 <div>
                                     <a href="${contextPath}/member/myPage/info" id="nickname">${loginMember.memberNickname}</a>

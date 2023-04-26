@@ -25,4 +25,20 @@ public interface MemberService {
 	 */
 	public abstract Member login(Member inputMember);
 	
+	
+
+	public abstract int emailDupCheck(String memberEmail);
+
+
+
+	public abstract int nicknameDupCheck(String memberNickname);
+
+
+
+	public abstract Member memberSignup(Member inputMember);
+
+
+
+	public abstract Member selectOne(String memberEmail);
+	
 }
