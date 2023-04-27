@@ -1,0 +1,10 @@
+package edu.kh.comm.model.dao;
+
+import org.springframework.stereotype.Repository;
+
+@Repository
+public class MyPageDAO {
+
+	@Autowired
+	private SqlSessionTemplate sqlSession;
+}

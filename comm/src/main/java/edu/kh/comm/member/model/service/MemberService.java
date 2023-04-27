@@ -37,7 +37,7 @@ public interface MemberService {
 
 
 
-	public abstract Member memberSignup(Member inputMember);
+	public abstract int memberSignup(Member inputMember);
 
 
 

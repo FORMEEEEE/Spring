@@ -67,12 +67,9 @@ public class MemberDAO {
 		return sqlSession.selectOne("memberMapper.nicknameDupCheck", memberNickname );
 	}
 
-	public Member memberSignup(Member inputMember) {
-		Member signUpMember = sqlSession.selectOne("memberMapper.signUp", inputMember);
+	public int memberSignup(Member inputMember) {
 		
-		
-		return signUpMember;
-		
+		return sqlSession.insert("memberMapper.signUp", inputMember);
 	}
 
 	public Member selectOne(String memberEmail) {
@@ -89,7 +86,8 @@ public class MemberDAO {
 		
 		return member;
 	}
-	
+
+
 	
 
 	

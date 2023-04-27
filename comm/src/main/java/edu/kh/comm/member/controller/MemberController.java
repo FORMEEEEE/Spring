@@ -249,7 +249,6 @@ public class MemberController {
 		
 	}
 	
-	// 닉네임 중복 검사
 	@ResponseBody
 	@GetMapping("/nicknameDupCheck")
 	public int nicknameDupCheck(String memberNickname) {
@@ -259,32 +258,41 @@ public class MemberController {
 	
 	@PostMapping("/signUp")
 	public String memberSignup(Member inputMember,
-
 			Model model) {
 		
-	 
+		if(inputMember.getMemberAddress() != null) {
+			logger.debug(inputMember.getMemberAddress());
+			String[] address = inputMember.getMemberAddress().split(",");
+			String address2 = String.join(",,", address);
+			inputMember.setMemberAddress(address2);
+		}
 		
+		String message = "";
 		
-		Member signUpMember = service.memberSignup(inputMember);
+		int result = service.memberSignup(inputMember);
 		
-		model.addAttribute("signUpmember", signUpMember);
+		if(result == 1) {
+			message = "회원가입 성공";
+		} else {
+			message = "회원가입 실패";
+		}
+		
+		model.addAttribute("message", message);
 		
 		return "redirect:/";
 	}
 	
+	// 회원 목록 조회 ajax
 	@ResponseBody
 	@PostMapping("/selectOne")
 	public Member selectOne(@RequestParam("memberEmail") String memberEmail) {
 		
 		Member member = service.selectOne(memberEmail);
 		
-		logger.debug(member + "");
-		
-		
 		return member;
 	}
 	
-	
+	// 회원 목록 조회 ajax
 	@ResponseBody
 	@GetMapping("/selectAll")
 	public List<Member> selectAll(){

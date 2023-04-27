@@ -1,0 +1,11 @@
+package edu.kh.comm.member.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+@RequestMapping
+@SessionAttributes({"loginMember"})
+public class MyPageController {
+
+}

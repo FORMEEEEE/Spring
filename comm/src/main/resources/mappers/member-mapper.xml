@@ -146,9 +146,9 @@
 		AND SECESSION_FL = 'N'
 		</select>
 		
-		<select id="signUp" parameterType="member" resultMap="member_rm">
+		<insert id="signUp" parameterType="member" >
 		INSERT INTO MEMBER VALUES(SEQ_MEMBER_NO.NEXTVAL, #{memberEmail}, #{memberPw}, #{memberNickname}, #{memberTel}, #{memberAddress}, DEFAULT, DEFAULT, DEFAULT)
-		</select>
+		</insert>
 
 		<select id="selectOne" parameterType="member" resultMap="member_rm">
 		SELECT * FROM MEMBER
