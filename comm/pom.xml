@@ -93,6 +93,14 @@
 		    <version>2.9.0</version>
 		</dependency>
 		
+		<!-- 사진,파일업로드 maven -->
+		<dependency>
+		    <groupId>commons-fileupload</groupId>
+		    <artifactId>commons-fileupload</artifactId>
+		    <version>1.4</version>
+		</dependency>
+		
+		
 		
 				
 				

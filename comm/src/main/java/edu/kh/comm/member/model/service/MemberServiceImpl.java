@@ -115,6 +115,12 @@ public class MemberServiceImpl implements MemberService{ //implements : 상속
 		inputMember.setMemberPw(bcrypt.encode(inputMember.getMemberPw()));
 		
 		return dao.memberSignup(inputMember);
+		
+		// insert, update, delete 수행하기 위한 메서드 존재함
+		
+		// * insert() / update() / delete() 메서드의 반환값은 int 고정
+		// - > mapper에서도 resultType = _int
+		// -> resultType 생략 가능(묵기적으로 _int)
 	}
 
 
@@ -122,7 +128,9 @@ public class MemberServiceImpl implements MemberService{ //implements : 상속
 
 	@Override
 	public Member selectOne(String memberEmail) {
+		
 		Member member = dao.selectOne(memberEmail);
+		
 		return member;
 	}
 

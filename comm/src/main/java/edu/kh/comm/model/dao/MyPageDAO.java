@@ -1,5 +1,7 @@
 package edu.kh.comm.model.dao;
 
+import java.util.Map;
+
 import org.mybatis.spring.SqlSessionTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,19 +25,41 @@ public class MyPageDAO {
 		return sqlSession.selectOne("myPageMapper.checkPw", loginMember);
 	}
 
-	public int changePw(Member loginMember) {
-		
-		return sqlSession.update("myPageMapper.changePw", loginMember);
-	}
+	/*
+	 * public int changePw(Member loginMember) {
+	 * 
+	 * return sqlSession.update("myPageMapper.changePw", loginMember); }
+	 */
 
 	public int changeInfo(Member loginMember) {
 		
 		return sqlSession.update("myPageMapper.changeInfo", loginMember);
 	}
 
-	public int secession(Member loginMember) {
+	/*
+	 * public int secession(Member loginMember) {
+	 * 
+	 * return sqlSession.update("myPageMapper.updateInfo", loginMember); }
+	 */
+
+	public String selectEncPw(int memberNo) {
 		
-		return sqlSession.delete("myPageMapper.deleteInfo", loginMember);
+		return sqlSession.selectOne("myPageMapper.selectEncPw", memberNo);
+	}
+
+	public int changePw(Map<String, Object> paramMap) {
+		
+		return sqlSession.update("myPageMapper.changePw", paramMap);
+	}
+
+	public int secession(int memberNo) {
+		
+		return sqlSession.update("myPageMapper.secession", memberNo);
+	}
+
+	// 프로필 이미지 수정
+	public int updateProfile(Map<String, Object> paramMap) {
+		return sqlSession.update("myPageMapper.updateProfile", paramMap);
 	}
 	
 }

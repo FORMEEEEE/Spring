@@ -1,0 +1,161 @@
+package edu.kh.comm.member.model.service;
+
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import edu.kh.comm.common.Util;
+import edu.kh.comm.member.model.vo.Member;
+import edu.kh.comm.model.dao.MyPageDAO;
+
+@Service
+public class MyPageServiceImpl implements MyPageService{
+
+	@Autowired
+	private MyPageDAO dao;
+	
+	@Autowired
+	private BCryptPasswordEncoder bcrypt;
+	
+	private Logger logger = LoggerFactory.getLogger(MyPageServiceImpl.class);
+
+	/*
+	 * @Override public int changePw(Member loginMember, String newPw) {
+	 * 
+	 * int result = 0;
+	 * 
+	 * // 비밀번호 확인 String currentPw = dao.checkPw(loginMember);
+	 * 
+	 * // 평문 -> 암호화가 일치할때 newPw를 loginMember에 저장
+	 * if(bcrypt.matches(loginMember.getMemberPw(), currentPw)) { newPw =
+	 * bcrypt.encode(newPw); loginMember.setMemberPw(newPw); result =
+	 * dao.changePw(loginMember); }else { result = 0; }
+	 * 
+	 * return result; }
+	 */
+	
+	@Override
+	public int changePw(Map<String, Object> paramMap) {
+		
+		// 1) db에서 현재 회원의 비밀번호를 조회
+		String encPw = dao.selectEncPw((int)paramMap.get("memberNo"));
+		
+		// 2) 입력된 현재 비밀번호(평문)와
+		// 	조회된 비밀번호 (암호화)를 비교(matches())이용
+		
+		// 2) 비교 결과가 일치하면
+		// 새 비밀번호를 암호화하여 update
+		
+		if(bcrypt.matches((String)paramMap.get("currentPw"), encPw)) {
+			
+			paramMap.put("newPw", bcrypt.encode((String)paramMap.get("newPw")));
+			
+			// map에 이미 같은 key가 존재하면 value만 덮어씀
+			return dao.changePw(paramMap);
+		}
+		
+		// 비교결과가 일치하지 않으면 0
+		return 0;
+	}
+
+	@Override
+	public int changeInfo(Member loginMember, Map<String, Object> paramMap, String[] updateAddress) {
+		
+		loginMember.setMemberNickname((String)paramMap.get("updateNickname"));
+		loginMember.setMemberTel((String)paramMap.get("updateTel"));
+		
+		if(loginMember.getMemberAddress() != null) {
+			
+			String address = String.join("", updateAddress);
+			loginMember.setMemberAddress(address);
+		}else {
+			String address = null;
+			loginMember.setMemberAddress(address);
+		}
+		
+		
+		return dao.changeInfo(loginMember);
+	}
+
+	//회원탈퇴
+	/*
+	 * @Override public int secession(Member loginMember, String memberPw) {
+	 * 
+	 * int result = 0;
+	 * 
+	 * loginMember.setMemberPw(memberPw);
+	 * 
+	 * String checkedPw = dao.checkPw(loginMember);
+	 * 
+	 * if(bcrypt.matches(loginMember.getMemberPw(), checkedPw)) {
+	 * 
+	 * result = dao.secession(loginMember);
+	 * 
+	 * }else { result = 0; }
+	 * 
+	 * return result; }
+	 */
+
+	@Override
+	public int secession(Member loginMember) {
+		
+		// db에서 암호화된 비밀번호를 조회하여 입력받은 비밀번호와 비교
+		String encPw = dao.selectEncPw(loginMember.getMemberNo());
+		
+		// 파라미터로 memberPw안받아온이유 : vo필드랑 이름이 같으면 덮어씌워져서 그냥써도됨
+		if(bcrypt.matches(loginMember.getMemberPw(), encPw)) {
+			// 비밀번호가 일치하면 회원번호를 이용해 탈퇴
+			return dao.secession(loginMember.getMemberNo());
+		}
+		// 비밀번호가 일치하지 않으면 0 반환
+		return 0;
+	}
+
+	// 이미지 수정 서비스 구현
+	@Override
+	public int updateProfile(Map<String, Object> paramMap) {
+		
+		MultipartFile uploadImage = (MultipartFile)paramMap.get("uploadImage");
+		String delete = (String)paramMap.get("delete"); // 0을 누르면 변경 / 1누르면 삭제
+		
+		// 프로필 이미지 삭제여부를 확인해서
+		// 삭제가 아닌경우(== 새 이미지로 변경) -> 업로드된 파일명을 변경함
+		// 삭제가 된 경우 -> null값 준비(db update)
+		
+		String renameImage = null; //변경된 파일명 저장
+		if(delete.equals("0")) { //이미지가 변경됨
+			
+			// 파일명 변경
+			// uploadImage.getOriginalFilename() : 원본파일명
+			renameImage = Util.fileRename(uploadImage.getOriginalFilename());
+			// 202344291412414.jpg
+			
+			paramMap.put("profileImage", paramMap.put("webPath", renameImage));
+			// resources/images/memberProfile/202344291412414.jpg 이런식으로 만들어짐
+			
+			
+		}else { // 1인경우 == 삭제
+			paramMap.put("profileImage", null);
+		}
+		
+		// DAO호출해서 프로필 이미지 수정하기
+		int result = dao.updateProfile(paramMap);
+		
+		// DB 수정 성공시 메모리에 임시저장되어있는 파일을 서버에 저장
+		if(result > 0) {
+			uploadImage.transferTo(new File(/*서버경로 + 파일명 */ paramMap.get("folderPath" + renameImage)));
+		}
+		
+		
+		
+		return 0;
+	}
+	
+	
+	
+}

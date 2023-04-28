@@ -1,6 +1,13 @@
 package edu.kh.comm.member.controller;
 
+import java.io.IOException;
+import java.io.ObjectInputFilter.Status;
 import java.util.Map;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.websocket.Session;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import edu.kh.comm.member.model.service.MemberService;
@@ -56,34 +64,60 @@ public class MyPageController{
 		return "/member/myPage-secession";
 	}
 	
-	// 비밀번호 변경
+	// 비밀번호 변경 내가 한 버전
+	/*
+	 * @PostMapping("/changePw") public String changePw(@RequestParam String
+	 * currentPw,
+	 * 
+	 * @RequestParam String newPw, SessionStatus status, Model model) {
+	 * 
+	 * String message = "";
+	 * 
+	 * //세션에 로그인된 정보 가져오기 Member loginMember = (Member)
+	 * model.getAttribute("loginMember");
+	 * 
+	 * // 로그인멤버에 현재 비밀번호 설정 loginMember.setMemberPw(currentPw);
+	 * 
+	 * int result = service.changePw(loginMember, newPw);
+	 * 
+	 * if(result != 0) { message = "비밀번호 변경됨"; status.setComplete(); }else { message
+	 * = "비밀번호가 일치하지 않음"; }
+	 * 
+	 * model.addAttribute("message", message);
+	 * 
+	 * return "redirect:/"; }
+	 */
+	
+	// 비밀번호 변경 map ver
 	@PostMapping("/changePw")
-	public String changePw(@RequestParam String currentPw,
-							@RequestParam String newPw,
-							SessionStatus status,
-							Model model) {
+	public String changePw(@RequestParam Map<String, Object> paramMap,
+							@ModelAttribute("loginMember") Member loginMember,
+							RedirectAttributes ra
+			) {
 		
-		String message = "";
+		// 로그인 된 회원의 번호를 paramMap추가
+		paramMap.put("memberNo", loginMember.getMemberNo());
 		
-		//세션에 로그인된 정보 가져오기
-		Member loginMember = (Member) model.getAttribute("loginMember");
 		
-		// 로그인멤버에 현재 비밀번호 설정
-		loginMember.setMemberPw(currentPw);
 		
-		int result = service.changePw(loginMember, newPw);
+		int result = service.changePw(paramMap);
 		
-		if(result != 0) {
-			message = "비밀번호 변경됨";
-			status.setComplete();
+		String message = null;
+		String path = null;
+		
+		if(result > 0) {
+			// 변경
+			message = "변경됨";
+			path = "info";
 		}else {
-			message = "비밀번호가 일치하지 않음";
+			message = "실패";
+			path = "changePw";
 		}
-		
-		model.addAttribute("message", message);
-		
+		ra.addFlashAttribute("message", message);
 		return "redirect:/";
 	}
+	
+	
 
 	// 내 정보 수정
 	@PostMapping("info")
@@ -93,16 +127,20 @@ public class MyPageController{
 							RedirectAttributes ra,
 							@RequestParam(value="agree", required=false) String agree
 			) {
-		
+		//파라미터 map으로 받아와야함 why? 여기서 설정하자마자 session으로 올라가서 그럼
+		// 앞으로는 map씁시다
 		int count = memberService.nicknameDupCheck((String)paramMap.get("updateNickname"));
+		log.debug(loginMember + "");
 		
 		if(count > 0) {
 			ra.addFlashAttribute("message", "중복된 닉네임입니다");
 		}else {
 			int result = service.changeInfo(loginMember, paramMap, updateAddress);
 			
-			if(result == 1) {
+			if(result > 0) {
 				ra.addFlashAttribute("message", "회원정보가 수정되었습니다");
+			}else {
+				ra.addFlashAttribute("message" ,"변경실패");
 			}
 		}
 		
@@ -137,6 +175,8 @@ public class MyPageController{
 		
 		// [해결 방법] 파라미터의 name 속성을 변경해서 얻어오면 문제해결!
 		// (필드명 겹쳐서 문제니깐 겹치지 않게 하자)
+		
+		
 	}
 	
 	// 회원탈퇴
@@ -144,32 +184,111 @@ public class MyPageController{
 	// session loginMember
 	// checkbox
 	
+	/*
+	 * @PostMapping("/secession") public String Secession(@RequestParam
+	 * ("memberPw")String memberPw, Model model, SessionStatus status,
+	 * RedirectAttributes ra,
+	 * 
+	 * @RequestParam(value="agree", required=false) String agree ) {
+	 * 
+	 * 
+	 * // VO필드값을 초기화한 loginMember를 불러옴 Member loginMember = (Member)
+	 * model.getAttribute("loginMember"); if(agree != null) { int result =
+	 * service.secession(loginMember, memberPw);
+	 * 
+	 * if(result == 1) { ra.addFlashAttribute("message", "회원탈퇴가 진행되었습니다");
+	 * status.isComplete(); }else { ra.addFlashAttribute("message",
+	 * "비밀번호가 일치하지 않습니다"); return "redirect:secession"; }
+	 * 
+	 * }else { ra.addFlashAttribute("message", "체크박스를 확인하세요"); }
+	 * 
+	 * return "redirect:/"; }
+	 */
+	
 	@PostMapping("/secession")
-	public String Secession(@RequestParam ("memberPw")String memberPw,
-							Model model,
+	public String secession(@ModelAttribute("loginMember") Member loginMember,
 							SessionStatus status,
-							RedirectAttributes ra,
-							@RequestParam(value="agree", required=false) String agree
+							HttpServletRequest req,
+							HttpServletResponse resp,
+							RedirectAttributes ra
 			) {
 		
-		// VO필드값을 초기화한 loginMember를 불러옴
-		Member loginMember = (Member) model.getAttribute("loginMember");
-		if(agree != null) {
-			int result = service.secession(loginMember, memberPw);
+		// 회원 탈퇴 서비스 호출
+		int result = service.secession(loginMember);
+		
+		
+		String message = null;
+		String path = null;
+		
+		// 탈퇴 성공 -> main
+		if(result > 0) {
+			message = "탈퇴됨";
+			path = "/";
 			
-			if(result == 1) {
-				ra.addFlashAttribute("message", "회원탈퇴가 진행되었습니다");
-				status.isComplete();
-			}else {
-				ra.addFlashAttribute("message", "비밀번호가 일치하지 않습니다");
-				return "redirect:secession";
-			}
+			// 세션 없애기
+			status.setComplete();
+			
+			//쿠키없애기
+			Cookie cookie = new Cookie("saveId", "");
+			cookie.setMaxAge(0);
+			cookie.setPath(req.getContextPath());
+			resp.addCookie(cookie);
 			
 		}else {
-			ra.addFlashAttribute("message", "체크박스를 확인하세요");
+			// 탈퇴 실패 -> 그자리
+			message = "회원탈퇴 실패";
+			path = "secession";
 		}
+		ra.addFlashAttribute("message", message);
+		
 		
 		return "redirect:/";
+	}
+	@GetMapping("/profile")
+	public String profilePage() {
+		
+		return "/member/myPage-profile";
+	}
+
+
+	
+	@PostMapping("/profile")
+	public String updateProfile(@ModelAttribute("loginMember") Member loginMember,
+								@RequestParam("uploadImage") MultipartFile uploadImage, //파일이미지
+								@RequestParam Map<String, Object> paramMap,
+								HttpServletRequest req, //파일 저장 경로 탐색용
+								RedirectAttributes ra) throws IOException{		
+		// 경로 작성하기
+		
+		// 1) 웹 접근 경로(/comm/resources/images/memberProfile/)
+		String webPath = "/resources/images/memberProfile/";
+		
+		// 2) 서버 저장 폴더 경로
+		
+		
+		String folderPath = req.getSession().getServletContext().getRealPath(webPath);
+		
+		paramMap.put("webPath", webPath);
+		paramMap.put("folderPath", folderPath);
+		paramMap.put("uploadImage", uploadImage);
+		paramMap.put("memberNo", loginMember.getMemberNo());
+		
+		int result = service.updateProfile(paramMap);
+		
+		String message = null;
+
+		if(result > 0) {
+			message = "프로필 이미지 변경됨";
+			
+			// DB - 세션 동기화
+			loginMember.setProfileImage((String)paramMap.get("profileImage"));
+		}else {
+			message = "이미지 변경 실패";
+		}
+		
+		ra.addFlashAttribute("message", message);
+		
+		return "redirect:profile";
 	}
 	
 	
